@@ -72,5 +72,3 @@ for student in students:
         else:
             exercise_string += f"and {exercise.name}"
     print(f"{student.first} is working on {exercise_string}")
-
-
