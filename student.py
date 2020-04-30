@@ -4,3 +4,5 @@ class Student(NSSPerson):
         super().__init__(first, last, handle, cohort)
         self.exercises = list()
 
+    def __repr__(self):
+        return f'{self.first_name} {self.last_name} is in {self.cohort}'
