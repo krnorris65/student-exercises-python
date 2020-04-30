@@ -33,8 +33,10 @@ CREATE TABLE StudentExercise (
 	Id 			INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	StudentId 	INTEGER NOT NULL,
 	ExerciseId 	INTEGER NOT NULL,
+	InstructorId INTEGER NOT NULL,
 	FOREIGN KEY(StudentId) REFERENCES Student(Id),
-	FOREIGN KEY(ExerciseId) REFERENCES Exercise(Id)
+	FOREIGN KEY(ExerciseId) REFERENCES Exercise(Id),
+	FOREIGN KEY(InstructorId) REFERENCES Instructor(Id)
 );
 
 INSERT INTO Cohort (Name)
@@ -61,11 +63,11 @@ VALUES ("Mollie", "Goforth", "mollieg", 1),
 ("Billy", "Mitchell", "billym", 2),
 ("Landon", "Morgan", "landonm", 1);
 
-INSERT INTO StudentExercise (StudentId, ExerciseId)
-VALUES (1, 1), (1, 4), 
-(2, 5), (2, 2), 
-(3, 3), (3, 1), 
-(4, 4), (4, 5), 
-(5, 4), (5, 1), 
-(6, 2), (6, 3), 
-(7, 2), (7, 5);
+INSERT INTO StudentExercise (StudentId, ExerciseId, InstructorId)
+VALUES (1, 1, 2), (1, 4, 2), 
+(2, 5, 1), (2, 2, 1), 
+(3, 3, 3), (3, 1, 3), 
+(4, 4, 2), (4, 5, 2), 
+(5, 4, 1), (5, 1, 1), 
+(6, 2, 3), (6, 3, 3), 
+(7, 2, 2), (7, 5, 2);
