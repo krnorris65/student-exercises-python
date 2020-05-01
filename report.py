@@ -31,8 +31,30 @@ class StudentExerciseReports():
             """)
 
             all_students = db_cursor.fetchall()
-
+            print("\n***All Students with Cohort Name***")
             [print(s) for s in all_students]
+    
+    def all_instructors(self):
+        '''Retrieve all instructors with the cohort name'''
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory
+
+    def all_cohorts(self):
+        pass
+
+    def all_exercises(self):
+        pass
+
+    def javascript_exercises(self):
+        pass
+
+    def python_exercises(self):
+        pass
+
+    def csharp_exercises(self):
+        pass
+
+
 
 
 reports = StudentExerciseReports()
