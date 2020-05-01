@@ -100,10 +100,10 @@ class StudentExerciseReports():
             FROM Exercise e
             """)
 
-            all_excercies = db_cursor.fetchall()
+            all_exercises = db_cursor.fetchall()
 
             print("\n*** All Exercises ***")
-            [print(e) for e in all_excercies]
+            [print(e) for e in all_exercises]
 
     def javascript_exercises(self):
         pass
