@@ -1,6 +1,8 @@
 import sqlite3
 from student import Student
 from instructor import Instructor
+from cohort import Cohort
+from exercise import Exercise
 
 
 class StudentExerciseReports():
@@ -63,7 +65,24 @@ class StudentExerciseReports():
             [print(i) for i in all_instructors]
 
     def all_cohorts(self):
-        pass
+        '''Retrive all cohorts'''
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = lambda cursor, row: Cohort(
+                row[1]
+            )
+
+            db_cursor = conn.cursor()
+
+            db_cursor.execute("""
+            SELECT c.Id,
+                c.Name
+            FROM Cohort c
+            """)
+
+            all_cohorts = db_cursor.fetchall()
+
+            print("\n*** All Cohorts ***")
+            [print(c) for c in all_cohorts]
 
     def all_exercises(self):
         pass
@@ -83,3 +102,4 @@ class StudentExerciseReports():
 reports = StudentExerciseReports()
 reports.all_students()
 reports.all_instructors()
+reports.all_cohorts()
