@@ -171,15 +171,60 @@ class StudentExerciseReports():
             print("\n*** C# Exercises ***")
             [print(e) for e in csharp_exercises]
 
+    def exercises_with_students(self):
+        '''Retrieves the students working on each exercise'''
+        exercises = dict()
 
+        with sqlite3.connect(self.db_path) as conn:
+            db_cursor = conn.cursor()
+
+            db_cursor.execute("""
+                SELECT
+                    e.Id ExerciseId,
+                    e.Name,
+                    s.Id,
+                    s.FirstName,
+                    s.LastName
+                FROM Exercise e
+                JOIN StudentExercise se ON se.ExerciseId = e.Id
+                JOIN Student s ON s.Id = se.StudentId
+            """)
+
+            dataset = db_cursor.fetchall()
+
+            for row in dataset:
+                exercise_id = row[0]
+                exercise_name = row[1]
+                student_id = row[2]
+                student_name = f'{row[3]} {row[4]}'
+
+                if exercise_name not in exercises:
+                    exercises[exercise_name] = [student_name]
+                else:
+                    exercises[exercise_name].append(student_name)
+            
+            for exercise_name, students in exercises.items():
+                print(f"{exercise_name} is being worked on by:")
+                for student in students:
+                    print(f'\t* {student}')
+    
+    def student_workload(self):
+        '''Retrieves the exercises being worked on by each student'''
+        pass
+    
+    def exercises_by_instructor(self):
+        '''Retrieves the exercises that have been assigned by each instructor'''
+        pass
 
 
 
 reports = StudentExerciseReports()
-reports.all_students()
-reports.all_instructors()
-reports.all_cohorts()
-reports.all_exercises()
-reports.javascript_exercises()
-reports.python_exercises()
-reports.csharp_exercises()
+# reports.all_students()
+# reports.all_instructors()
+# reports.all_cohorts()
+# reports.all_exercises()
+# reports.javascript_exercises()
+# reports.python_exercises()
+# reports.csharp_exercises()
+
+reports.exercises_with_students()
