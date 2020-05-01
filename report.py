@@ -85,7 +85,25 @@ class StudentExerciseReports():
             [print(c) for c in all_cohorts]
 
     def all_exercises(self):
-        pass
+        '''Retrive all the exercises'''
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = lambda cursor, row: Exercise(
+                row[1], row[2]
+            )
+
+            db_cursor = conn.cursor()
+
+            db_cursor.execute("""
+            SELECT e.Id,
+                e.Name,
+                e.Language
+            FROM Exercise e
+            """)
+
+            all_excercies = db_cursor.fetchall()
+
+            print("\n*** All Exercises ***")
+            [print(e) for e in all_excercies]
 
     def javascript_exercises(self):
         pass
@@ -103,3 +121,4 @@ reports = StudentExerciseReports()
 reports.all_students()
 reports.all_instructors()
 reports.all_cohorts()
+reports.all_exercises()
