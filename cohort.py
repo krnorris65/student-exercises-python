@@ -9,3 +9,6 @@ class Cohort:
 
     def add_instructor(self, instructor):
         self.instructors.append(instructor)
+    
+    def __repr__(self):
+        return f'{self.name}'
