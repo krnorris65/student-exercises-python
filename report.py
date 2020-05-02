@@ -210,11 +210,80 @@ class StudentExerciseReports():
     
     def student_workload(self):
         '''Retrieves the exercises being worked on by each student'''
-        pass
+        students = dict()
+
+        with sqlite3.connect(self.db_path) as conn:
+            db_cursor = conn.cursor()
+
+            db_cursor.execute("""
+            SELECT 
+                s.Id,
+                s.FirstName,
+                s.LastName,
+                e.Id AS "ExerciseId",
+                e.Name
+            FROM Student s 
+            JOIN StudentExercise se ON se.StudentId = s.Id
+            JOIN Exercise e ON e.Id = se.ExerciseId
+            """)
+
+            dataset = db_cursor.fetchall()
+
+            for row in dataset:
+                student_id = row[0]
+                student_name = f'{row[1]} {row[2]}'
+                exercise_id = row[3]
+                exercise_name = row[4]
+
+                if student_name not in students:
+                    students[student_name] = [exercise_name]
+                else:
+                    students[student_name].append(exercise_name)
+
+            for student_name, exercises in students.items():
+                print(f"{student_name} is working on:")
+                for exercise in exercises:
+                    print(f"\t* {exercise}")
+        
     
     def exercises_by_instructor(self):
         '''Retrieves the exercises that have been assigned by each instructor'''
-        pass
+        instructors = dict()
+
+        with sqlite3.connect(self.db_path) as conn:
+            db_cursor = conn.cursor()
+
+            db_cursor.execute(""" 
+            SELECT 
+                i.Id,
+                i.FirstName,
+                i.LastName,
+                e.Id AS "ExerciseId",
+                e.Name
+                FROM Instructor i 
+            JOIN StudentExercise se ON se.InstructorId = i.Id
+            JOIN Exercise e ON e.Id = se.ExerciseId
+            """)
+
+            dataset = db_cursor.fetchall()
+
+            for row in dataset:
+                instructor_id = row[0]
+                instructor_name = f'{row[1]} {row[2]}'
+                exercise_id = row[3]
+                exercise_name = row[4]
+
+                if instructor_name not in instructors:
+                    instructors[instructor_name] = [exercise_name]
+                else:
+                    # only add the exercise to the list if it is not already in there
+                    if exercise_name not in instructors[instructor_name]:
+                        instructors[instructor_name].append(exercise_name)
+            
+            for instructor_name, exercises in instructors.items():
+                print(f"{instructor_name} has assigned:")
+                for exercise in exercises:
+                    print(f"\t* {exercise}")
 
 
 
@@ -227,4 +296,6 @@ reports = StudentExerciseReports()
 # reports.python_exercises()
 # reports.csharp_exercises()
 
-reports.exercises_with_students()
+# reports.exercises_with_students()
+# reports.student_workload()
+reports.exercises_by_instructor()
