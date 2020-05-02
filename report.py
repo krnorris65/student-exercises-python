@@ -334,6 +334,65 @@ class StudentExerciseReports():
                     for student_name in students:
                         print(f"\t* {instructor_name} assigned this to {student_name}")
             
+    def cohort_report(self):
+        cohorts = dict()
+        with sqlite3.connect(self.db_path) as conn:
+            db_cursor = conn.cursor()
+
+            db_cursor.execute(""" 
+            SELECT 
+                c.Id AS "CohortId",
+                c.Name,
+                s.Id AS "StudentId",
+                s.FirstName,
+                s.LastName,
+                s.SlackHandle,
+                s.CohortId,
+                i.Id AS "InstructorId",
+                i.FirstName, 
+                i.LastName, 
+                i.SlackHandle, 
+                i.CohortId, 
+                i.Specialty
+            FROM Cohort c 
+            JOIN Student s ON s.CohortId = c.Id
+            JOIN Instructor i ON i.CohortId = c.Id
+            """)
+
+            dataset = db_cursor.fetchall()
+
+            for row in dataset:
+                cohort_id = row[0]
+                cohort_name = row[1]
+                # first, last, handle, cohort
+                student = Student(row[3], row[4], row[5], row[1])
+                # first, last, handle, cohort, specialty
+                instructor = Instructor(row[8], row[9], row[10], row[1], row[12])
+
+                if cohort_name not in cohorts:
+                    cohorts[cohort_name] = {
+                        "students": [student],
+                        "instructors": [instructor]
+                    }
+                else:
+                    # convert the items in each list to only represent the student or instructor's full name
+                    student_names_in_list = list(map(lambda s: s.full_name, cohorts[cohort_name]["students"]))
+                    instructor_names_in_list = list(map(lambda i: i.full_name, cohorts[cohort_name]["instructors"]))
+                    # check to see if that student or instructor name is already in the list, if it's not add it
+                    if student.full_name not in student_names_in_list:
+                        cohorts[cohort_name]["students"].append(student)
+                    if instructor.full_name not in instructor_names_in_list:
+                        cohorts[cohort_name]["instructors"].append(instructor)
+            
+            for cohort, value in cohorts.items():
+                print(f"{cohort}:")
+                if len(value["students"]) > 0:
+                    print("\tStudents:")
+                    [print(f"\t* {s}") for s in value["students"]]
+                if len(value["instructors"]) > 0:
+                    print("\tInstructors:")
+                    [print(f"\t* {i}") for i in value["instructors"]]
+
 
 reports = StudentExerciseReports()
 # reports.all_students()
@@ -347,4 +406,5 @@ reports = StudentExerciseReports()
 # reports.exercises_with_students()
 # reports.student_workload()
 # reports.exercises_by_instructor()
-reports.assigned_exercises()
+# reports.assigned_exercises()
+reports.cohort_report()

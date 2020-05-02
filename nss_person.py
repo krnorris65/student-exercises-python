@@ -4,3 +4,7 @@ class NSSPerson():
         self.last_name = last
         self.slack_handle = handle
         self.cohort = cohort
+    
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
