@@ -171,15 +171,131 @@ class StudentExerciseReports():
             print("\n*** C# Exercises ***")
             [print(e) for e in csharp_exercises]
 
+    def exercises_with_students(self):
+        '''Retrieves the students working on each exercise'''
+        exercises = dict()
 
+        with sqlite3.connect(self.db_path) as conn:
+            db_cursor = conn.cursor()
+
+            db_cursor.execute("""
+                SELECT
+                    e.Id ExerciseId,
+                    e.Name,
+                    s.Id,
+                    s.FirstName,
+                    s.LastName
+                FROM Exercise e
+                JOIN StudentExercise se ON se.ExerciseId = e.Id
+                JOIN Student s ON s.Id = se.StudentId
+            """)
+
+            dataset = db_cursor.fetchall()
+
+            for row in dataset:
+                exercise_id = row[0]
+                exercise_name = row[1]
+                student_id = row[2]
+                student_name = f'{row[3]} {row[4]}'
+
+                if exercise_name not in exercises:
+                    exercises[exercise_name] = [student_name]
+                else:
+                    exercises[exercise_name].append(student_name)
+            
+            for exercise_name, students in exercises.items():
+                print(f"{exercise_name} is being worked on by:")
+                for student in students:
+                    print(f'\t* {student}')
+    
+    def student_workload(self):
+        '''Retrieves the exercises being worked on by each student'''
+        students = dict()
+
+        with sqlite3.connect(self.db_path) as conn:
+            db_cursor = conn.cursor()
+
+            db_cursor.execute("""
+            SELECT 
+                s.Id,
+                s.FirstName,
+                s.LastName,
+                e.Id AS "ExerciseId",
+                e.Name
+            FROM Student s 
+            JOIN StudentExercise se ON se.StudentId = s.Id
+            JOIN Exercise e ON e.Id = se.ExerciseId
+            """)
+
+            dataset = db_cursor.fetchall()
+
+            for row in dataset:
+                student_id = row[0]
+                student_name = f'{row[1]} {row[2]}'
+                exercise_id = row[3]
+                exercise_name = row[4]
+
+                if student_name not in students:
+                    students[student_name] = [exercise_name]
+                else:
+                    students[student_name].append(exercise_name)
+
+            for student_name, exercises in students.items():
+                print(f"{student_name} is working on:")
+                for exercise in exercises:
+                    print(f"\t* {exercise}")
+        
+    
+    def exercises_by_instructor(self):
+        '''Retrieves the exercises that have been assigned by each instructor'''
+        instructors = dict()
+
+        with sqlite3.connect(self.db_path) as conn:
+            db_cursor = conn.cursor()
+
+            db_cursor.execute(""" 
+            SELECT 
+                i.Id,
+                i.FirstName,
+                i.LastName,
+                e.Id AS "ExerciseId",
+                e.Name
+                FROM Instructor i 
+            JOIN StudentExercise se ON se.InstructorId = i.Id
+            JOIN Exercise e ON e.Id = se.ExerciseId
+            """)
+
+            dataset = db_cursor.fetchall()
+
+            for row in dataset:
+                instructor_id = row[0]
+                instructor_name = f'{row[1]} {row[2]}'
+                exercise_id = row[3]
+                exercise_name = row[4]
+
+                if instructor_name not in instructors:
+                    instructors[instructor_name] = [exercise_name]
+                else:
+                    # only add the exercise to the list if it is not already in there
+                    if exercise_name not in instructors[instructor_name]:
+                        instructors[instructor_name].append(exercise_name)
+            
+            for instructor_name, exercises in instructors.items():
+                print(f"{instructor_name} has assigned:")
+                for exercise in exercises:
+                    print(f"\t* {exercise}")
 
 
 
 reports = StudentExerciseReports()
-reports.all_students()
-reports.all_instructors()
-reports.all_cohorts()
-reports.all_exercises()
-reports.javascript_exercises()
-reports.python_exercises()
-reports.csharp_exercises()
+# reports.all_students()
+# reports.all_instructors()
+# reports.all_cohorts()
+# reports.all_exercises()
+# reports.javascript_exercises()
+# reports.python_exercises()
+# reports.csharp_exercises()
+
+# reports.exercises_with_students()
+# reports.student_workload()
+reports.exercises_by_instructor()
